@@ -8,14 +8,13 @@ use Exception;
 
 class InvoiceService {
     private $invoices;
-    // private $invoicesWithTotal;
     private $pdo;
 
     public function __construct() {
         $this->pdo = PdoConnection::getConnection();
     }
 
-    public function fetchAllInvoices(): array
+    public function fetchInvoicesAtCondition(): array
     {
         try {
             $query = $this->pdo->prepare("SELECT * FROM invoices WHERE `invoice_no` = 599");
@@ -25,11 +24,11 @@ class InvoiceService {
             return $this->invoices;
 
         } catch (Exception $e) { 
-            return "Something went wrong. Please try again later!";
+            return ["err" =>"Something went wrong. Please try again later!"];
         }
     }
     
-    public function calculateInvoiceTotal(): array
+    public function calculateInvoicesTotal(): array
     {
         try {
             if(count($this->invoices) > 0){
@@ -45,33 +44,38 @@ class InvoiceService {
             }
 
         } catch (Exception $e) { 
-            return "Something went wrong. Please try again later!";
+            return ["err" =>"Something went wrong. Please try again later!"];
         }
     }
 
-    public function updateTotalColumn(): array | string
+    public function updateTotalColumn(): array
     {
-        $casesStr = General::getCasesSqlString($this->invoices);
-        // var_dump($casesStr);
-        // die();
         try {
+            $casesStr = General::getCasesSqlString($this->invoices);
             $q = "
                 UPDATE invoices 
                     SET total = CASE 
                         {$casesStr}     
                         ELSE price
                     END
+                    WHERE invoice_no = 599
             ";
-            // var_dump($q);
-            // die();
             $this->pdo->beginTransaction();
             $this->pdo->query($q);
             $this->pdo->commit();
             return $this->invoices;
 
         } catch (Exception $e) { 
-            return $e;
-            return "Something went wrong. Please try again later!";
+            return ["err" =>"Something went wrong. Please try again later!"];
+        }
+    }
+
+    public function getInvoices(): array
+    {
+        try {
+            return $this->invoices;
+        } catch (Exception $e){
+            return ["err" =>"Something went wrong. Please try again later!"];
         }
     }
     

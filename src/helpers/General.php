@@ -21,13 +21,4 @@ class General {
         }
         return $sqlStr;
     }
-
-    public static function getIdsTuple(array $invoices): array
-    {
-        $tupleStr = "";
-        foreach($invoices as $invoice ) { 
-            // $ids = self::getIdsTuple($invoice);
-            
-         }
-    }
 }
